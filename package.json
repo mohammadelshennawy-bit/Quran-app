@@ -1,4 +1,19 @@
-{"name":"quran-app","version":"1.0.0","private":true,"description":"المصحف الشريف - برواية حفص عن عاصم",
-"scripts":{"sync":"cap sync"},
-"dependencies":{"@capacitor/core":"^6.2.0","@capacitor/android":"^6.2.0","@capacitor/ios":"^6.2.0"},
-"devDependencies":{"@capacitor/cli":"^6.2.0","@capacitor/assets":"^3.0.5"}}
+{
+ "name": "quran-app",
+ "version": "1.0.0",
+ "private": true,
+ "description": "\u0627\u0644\u0645\u0635\u062d\u0641 \u0627\u0644\u0634\u0631\u064a\u0641 - \u0628\u0631\u0648\u0627\u064a\u0629 \u062d\u0641\u0635 \u0639\u0646 \u0639\u0627\u0635\u0645",
+ "scripts": {
+  "sync": "cap sync"
+ },
+ "dependencies": {
+  "@capacitor/core": "^6.2.0",
+  "@capacitor/android": "^6.2.0",
+  "@capacitor/ios": "^6.2.0",
+  "@capacitor/app": "^6.0.0"
+ },
+ "devDependencies": {
+  "@capacitor/cli": "^6.2.0",
+  "@capacitor/assets": "^3.0.5"
+ }
+}
