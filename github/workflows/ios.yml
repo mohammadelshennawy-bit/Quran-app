@@ -1,0 +1,33 @@
+name: Build iOS (unsigned IPA)
+on:
+  push: {branches: [main], tags: ['v*']}
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 20}
+      - run: npm install
+      - run: npx cap add ios
+      - name: Generate icons and splash
+        run: npx capacitor-assets generate --ios --iconBackgroundColor '#081433' --splashBackgroundColor '#081433'
+        continue-on-error: true
+      - run: npx cap sync ios
+      - name: Archive without code signing
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -archivePath $PWD/build/App.xcarchive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" archive
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload && cp -R ios/App/build/App.xcarchive/Products/Applications/App.app Payload/
+          zip -qr mushaf-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with: {name: mushaf-ios-unsigned-ipa, path: mushaf-unsigned.ipa}
+      - name: Attach IPA to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with: {files: mushaf-unsigned.ipa}
