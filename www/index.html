@@ -147,7 +147,7 @@ h3.sec{margin:20px 0 8px;font-size:17px;border-bottom:1px solid var(--line);padd
  <h3 class="sec">التثبيت والمشاركة</h3>
  <div class="acard" style="text-align:center"><p>شارك التطبيق بهذا الرابط، فهو يعرض لكل جهاز طريقة التثبيت المناسبة</p><div class="btns"><a class="obtn" href="download.html" target="_blank" rel="noopener">صفحة التحميل لكل الأجهزة ↗</a><button class="obtn" data-act="share">مشاركة الرابط</button></div></div>
  <h3 class="sec">عن التطبيق</h3>
- <div class="acard" style="font-size:14px;color:var(--mut)"><b style="color:var(--ink)">المصحف الشريف 1.2</b> — برواية حفص عن عاصم، 114 سورة و6236 آية، مع فهرس السور والأجزاء والعلامات والبحث ومواقيت الصلاة، ويعمل دون إنترنت.<br>خطوط المصحف من مجمع الملك فهد لطباعة المصحف الشريف.</div>
+ <div class="acard" style="font-size:14px;color:var(--mut)"><b style="color:var(--ink)">المصحف الشريف 1.2.1</b> — برواية حفص عن عاصم، 114 سورة و6236 آية، مع فهرس السور والأجزاء والعلامات والبحث ومواقيت الصلاة، ويعمل دون إنترنت.<br>خطوط المصحف من مجمع الملك فهد لطباعة المصحف الشريف.</div>
 </section>
 <section class="screen" id="reader">
  <div id="rh"><button class="ibtn" id="back" aria-label="رجوع">›</button><div class="nm"><b id="rn"></b><small id="rj"></small></div><button class="ibtn" id="more" aria-label="الأدوات">⋮</button></div>
@@ -363,4 +363,22 @@ $('start').onclick=()=>$('cover').classList.add('off');
 app.style.setProperty('--qf',curFont);theme(st('qlight')==='1');setFs(fs);surahList();juzList();home();prayerCard();doSearch();
 if('serviceWorker' in navigator&&!window.Capacitor&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.fonts.load('30px '+curFont).then(()=>{if($('reader').classList.contains('on'))layout(cur.n)});
-</script></body></html>
+</script><script>/* إحصائيات مشكاة عبر GoatCounter — بلا ملفات تعريف ولا بيانات شخصية */
+(function(){try{var APP='quran',LBL='المصحف الشريف',PAGE='open',GC='https://mishkat.goatcounter.com/count';
+var ua=navigator.userAgent,h=location.hostname;
+var os=/android/i.test(ua)?'android':(/iphone|ipad|ipod/i.test(ua)||(/macintosh/i.test(ua)&&navigator.maxTouchPoints>1))?'ios':/windows/i.test(ua)?'windows':/mac os/i.test(ua)?'mac':/linux/i.test(ua)?'linux':'other';
+var apk=h==='localhost'||!!window.Capacitor;
+var sa=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+var kind=apk?'apk':sa?'installed':'browser';
+var OSN={android:'أندرويد',ios:'آيفون',windows:'ويندوز',mac:'ماك',linux:'لينكس',other:'جهاز آخر'},KN={apk:'تطبيق APK',installed:'مثبّت من المتصفح',browser:'داخل المتصفح'};
+function send(p,t,ev){var u=GC+'?p='+encodeURIComponent(p)+'&t='+encodeURIComponent(t)+(ev?'&e=true':'')+'&s='+encodeURIComponent(screen.width+','+screen.height+','+(window.devicePixelRatio||1))+'&rnd='+Math.random().toString(36).slice(2);
+ if(!navigator.onLine){try{var q=JSON.parse(localStorage.getItem('mk-q')||'[]');if(q.length<30){q.push([p,t,ev?1:0]);localStorage.setItem('mk-q',JSON.stringify(q))}}catch(e){}return}
+ var i=new Image();i.src=u}
+function flush(){try{var q=JSON.parse(localStorage.getItem('mk-q')||'[]');if(!q.length||!navigator.onLine)return;localStorage.removeItem('mk-q');q.forEach(function(x){send(x[0],x[1],x[2])})}catch(e){}}
+window.mkEvent=function(name,title){send('/'+APP+'/'+name+'/'+os,(title||name)+' — '+LBL+' — '+OSN[os],true)};
+window.addEventListener('online',flush);flush();
+var key='mk-'+APP+'-'+PAGE;
+if(!sessionStorage.getItem(key)){sessionStorage.setItem(key,'1');
+ send('/'+APP+'/'+PAGE+'/'+os+'-'+kind,(PAGE==='open'?'فتح ':'صفحة التحميل — ')+LBL+' — '+OSN[os]+(PAGE==='open'?' ('+KN[kind]+')':''))}
+}catch(e){}})();</script>
+</body></html>
