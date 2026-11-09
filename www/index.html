@@ -364,7 +364,7 @@ setInterval(()=>{const els=document.querySelectorAll('[data-cd]');if(!els.length
  els.forEach(el=>{if(el.dataset.key!==np.key){prayerCard();if($('prayer').classList.contains('on'))renderPrayer();return}el.textContent=countdown(np.at-new Date())})},1000);
 function theme(l){document.body.classList.toggle('light',l);$('theme').textContent=l?'☀':'☾';document.querySelector('meta[name=theme-color]').content=l?'#f6f0e0':'#081433';st('qlight',l?'1':'0');refreshTools()}
 $('theme').onclick=()=>theme(!document.body.classList.contains('light'));
-$('start').onclick=()=>$('cover').classList.add('off');
+const hideCv=()=>$('cover').classList.add('off');$('start').onclick=hideCv;$('cover').addEventListener('click',hideCv);setTimeout(hideCv,2500);
 app.style.setProperty('--qf',curFont);theme(st('qlight')==='1');setFs(fs);surahList();juzList();home();prayerCard();doSearch();
 if('serviceWorker' in navigator&&!window.Capacitor&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.fonts.load('30px '+curFont).then(()=>{if($('reader').classList.contains('on'))layout(cur.n)});
