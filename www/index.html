@@ -172,7 +172,7 @@ const ad=n=>`<span class="dg">${ar(n)}</span>`,vt=s=>esc(s).replace(/\u06e9/g,'<
 const lk=(r,g)=>{let l=0,h=r.length-1;while(l<=h){let m=(l+h)>>1;if(g<r[m][0])h=m-1;else if(g>r[m][1])l=m+1;else return m+1}return 1};
 const norm=s=>String(s).normalize('NFKD').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'').replace(/[إأآٱ]/g,'ا').replace(/ى/g,'ي');
 const J=k=>{try{return JSON.parse(st(k))}catch(e){return null}};
-let marks=J('qm')||{},fs=+st('qfs')||30,cur=J('qlast')||{s:1,n:1},stack=['home'],curS=1,vEls=[];
+let marks=J('qm')||{},fs=+st('qfs')||24,cur=J('qlast')||{s:1,n:1},stack=['home'],curS=1,vEls=[];
 const app=$('app'),snip=(v,w=5)=>v.t.split(/\s+/).slice(0,w).join(' ');
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.k);toast.k=setTimeout(()=>t.classList.remove('on'),1600)}
 function go(name,push=true){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===name));
@@ -191,7 +191,7 @@ function markList(){const ks=Object.keys(marks).sort((a,b)=>marks[b]-marks[a]);$
 const FONTS=[['Q5','مصحف المدينة النبوية (حفص)'],['Q1','النسخ السندي (عادي)'],['Q2','النسخ السندي (عريض)'],['Q3','مجمع الملك فهد (AN)'],['Q4','النسخ السعودي (KSA)']];let curFont=FONTS.some(f=>f[0]===st('qfont'))?st('qfont'):'Q5';
 const fontRow=()=>`<div class="tool" style="flex-direction:column;align-items:stretch;gap:0"><span>نوع الخط</span><span class="fch">${FONTS.map(([k,l])=>`<button data-font="${k}" class="${k===curFont?'on':''}" style="font-family:${k},serif">${l}</button>`).join('')}</span></div>`;
 function setFont(f){curFont=f;app.style.setProperty('--qf',f);st('qfont',f);refreshTools();document.fonts.load('30px '+f).then(()=>{if($('reader').classList.contains('on'))layout(cur.n)});if($('reader').classList.contains('on')){const sk=stack.slice();openSurah(curS,cur.n);stack=sk}home();doSearch()}
-let mode=st('qmode')||'page',pg=0,pages=1;const QS={};DB.quarters.forEach((r,i)=>QS[r[0]]=i);const rb=g=>{const i=QS[g];if(i===undefined||g===1)return'';const j=i%8===0,h=i%4===0;return `<span class="rb ${j?'jz':h?'hz':''}" title="${j?'بداية الجزء '+ar(i/8+1):h?'بداية الحزب '+ar(i/4+1):'بداية ربع'}"></span>`};const BM=V[0].t,light=()=>document.body.classList.contains('light');
+let mode=st('qmode')||'scroll',pg=0,pages=1;const QS={};DB.quarters.forEach((r,i)=>QS[r[0]]=i);const rb=g=>{const i=QS[g];if(i===undefined||g===1)return'';const j=i%8===0,h=i%4===0;return `<span class="rb ${j?'jz':h?'hz':''}" title="${j?'بداية الجزء '+ar(i/8+1):h?'بداية الحزب '+ar(i/4+1):'بداية ربع'}"></span>`};const BM=V[0].t,light=()=>document.body.classList.contains('light');
 function openSurah(s,n=1){curS=s;const a=BS[s-1];let h='<div class="pgw">'+((s!==1&&s!==9)?`<div class="bsm">${BM}</div>`:'');
  h+='<div class="txt">'+a.map(v=>`${rb(v.g)}<span class="v${marks[s+':'+v.n]?' mk':''}${v.t.includes('\u06e9')?' sj':''}" data-n="${v.n}">${vt(v.t)} <span class="num">${ar(v.n)}</span></span> `).join('')+'</div>';
  h+=`<div class="snav">${s<114?`<button data-s="${s+1}" data-n="1">‹ سورة ${DB.names[s]}</button>`:''}${s>1?`<button data-s="${s-1}" data-n="1">سورة ${DB.names[s-2]} ›</button>`:''}</div></div>`;
@@ -367,7 +367,7 @@ setInterval(()=>{const els=document.querySelectorAll('[data-cd]');if(!els.length
 function theme(l){document.body.classList.toggle('light',l);$('theme').textContent=l?'☀':'☾';document.querySelector('meta[name=theme-color]').content=l?'#f6f0e0':'#081433';st('qlight',l?'1':'0');refreshTools()}
 $('theme').onclick=()=>theme(!document.body.classList.contains('light'));
 const hideCv=()=>$('cover').classList.add('off');$('start').onclick=hideCv;$('cover').addEventListener('click',hideCv);setTimeout(hideCv,2500);
-app.style.setProperty('--qf',curFont);theme(st('qlight')==='1');setFs(fs);surahList();juzList();home();prayerCard();doSearch();
+app.style.setProperty('--qf',curFont);theme(st('qlight')!=='0');setFs(fs);surahList();juzList();home();prayerCard();doSearch();
 if('serviceWorker' in navigator&&!window.Capacitor&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.fonts.load('30px '+curFont).then(()=>{if($('reader').classList.contains('on'))layout(cur.n)});
 </script><script>/* إحصائيات مشكاة عبر GoatCounter — بلا ملفات تعريف ولا بيانات شخصية */
