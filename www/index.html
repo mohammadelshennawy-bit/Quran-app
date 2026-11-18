@@ -100,10 +100,9 @@ h3.sec{margin:20px 0 8px;font-size:17px;border-bottom:1px solid var(--line);padd
 .pnext{text-align:center;padding:8px 12px;line-height:1.2;border:1px solid var(--gold);border-radius:18px;background:linear-gradient(135deg,var(--bg2),var(--card))}
 .pnext h2{margin:0;color:var(--gold);font-size:26px;line-height:1.2}.pnext h2 span{font-size:18px;color:var(--ink);font-weight:600}.pnext small{color:var(--mut);display:block;font-size:13px;line-height:1.3}
 .pcd{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;font-size:44px;font-weight:800;letter-spacing:2px;direction:ltr;color:var(--ink);margin:0;line-height:1.05}
-.ptable{margin-top:8px;padding:2px 14px;border:1px solid var(--line);border-radius:18px;background:var(--card)}
-.prow{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;line-height:1.2;border-bottom:1px solid var(--line);font-size:17px}
-.prow:last-child{border:0}.prow b{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;direction:ltr}.prow.nx,.prow.nx b{color:var(--gold);font-weight:800}
-.prow.cu span::after{content:" • الآن";font-size:12px;color:var(--gold)}
+.ptable{margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:18px;background:var(--card);display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.prow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px 9px;border:1px solid var(--line);border-radius:14px;background:var(--bg2);line-height:1.15;text-align:center;position:relative}.prow span{font-size:16px;font-weight:700}.prow b{font-size:19px;font-weight:800}.prow b{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;direction:ltr}.prow.nx{border:2px solid var(--gold);background:linear-gradient(160deg,var(--card),var(--bg2));box-shadow:0 4px 14px #0002}.prow.nx,.prow.nx b{color:var(--gold);font-weight:800}
+.prow.cu::after{content:"الآن";position:absolute;top:-9px;inset-inline-start:50%;transform:translateX(50%);font-size:11px;font-weight:800;padding:1px 8px;border-radius:9px;background:var(--gold);color:var(--on)}
 .pset{border:1px solid var(--line);border-radius:18px;background:var(--card);padding:6px 14px}
 .srow{padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.srow:last-child{border:0}.srow b{font-size:15px}.srow small{display:block;color:var(--mut);font-size:12px}
 .sel{width:100%;margin-top:6px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:15px}
