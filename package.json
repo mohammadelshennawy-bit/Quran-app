@@ -1,6 +1,6 @@
 {
  "name": "quran-app",
- "version": "1.5.0",
+ "version": "1.6.0",
  "private": true,
  "description": "\u0627\u0644\u0645\u0635\u062d\u0641 \u0627\u0644\u0634\u0631\u064a\u0641 - \u0628\u0631\u0648\u0627\u064a\u0629 \u062d\u0641\u0635 \u0639\u0646 \u0639\u0627\u0635\u0645",
  "scripts": {
@@ -10,7 +10,9 @@
   "@capacitor/core": "^6.2.0",
   "@capacitor/android": "^6.2.0",
   "@capacitor/ios": "^6.2.0",
-  "@capacitor/app": "^6.0.0"
+  "@capacitor/app": "^6.0.0",
+  "@capacitor/filesystem": "^6.0.4",
+  "@capacitor/share": "^6.0.4"
  },
  "devDependencies": {
   "@capacitor/cli": "^6.2.0",
