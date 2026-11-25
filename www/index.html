@@ -411,12 +411,26 @@ for(let g=1;g<QSL.length;g++){const q=QSQ[g],k=[['p',QSP[g]],['q',q],['h',Math.c
 
 let QSS=J(QS_KEY),qsLastTick=0,qsLastInput=Date.now(),qsDlg=null;
 
-function qsMetrics(S){const tc=S.tc||{},m={v:0,w:0,l:0,p:0,q:0,h:0,j:0,t:0,sk:0,skl:0,a:Math.round(S.a||0),s:S.s,e:S.last||S.s,first:0,last:0};
- for(const k in tc){const g=+k,L=QSL[g],need=L/QS_RATE;
-  if(tc[k]>=need&&L>0){const q=QSQ[g];m.v++;m.w+=QSW[g];m.l+=L;m.t+=Math.min(tc[k],need*QS_SLOW);
-   m.p+=L/QSU.p[QSP[g]];m.q+=L/QSU.q[q];m.h+=L/QSU.h[Math.ceil(q/4)];m.j+=L/QSU.j[Math.ceil(q/8)];
-   if(!m.first||g<m.first)m.first=g;if(g>m.last)m.last=g}
-  else{m.sk++;m.skl+=L}}
+/* حساب الجلسة:
+   1) الآية مقروءة إذا نالت وقتًا يكفي لقراءتها بأقصى سرعة.
+   2) إذا بدأت القراءة بآية مقروءة وانتهت بآية مقروءة، تُحتسب كل الآيات التي ظهرت على الشاشة بينهما مهما كانت السرعة.
+      (الآيات التي لم تظهر أصلًا — بالانتقال من الفهرس مثلًا — لا تُحتسب.)
+   3) العلامة المرجعية الموضوعة قبل نهاية الجلسة بأقل من دقيقة تُعدّ نقطة النهاية: تُحتسب الآيات حتى العلامة،
+      ولا يُحتسب ما بعدها — إلا إذا استمر القارئ في القراءة (أي مضت دقيقة أو أكثر بعد العلامة). */
+const QS_BM_WINDOW=60e3;
+function qsMetrics(S){const tc=S.tc||{},endT=S.last||S.s,m={v:0,w:0,l:0,p:0,q:0,h:0,j:0,t:0,sk:0,skl:0,a:Math.round(S.a||0),s:S.s,e:endT,first:0,last:0,bm:0};
+ const need=g=>QSL[g]/QS_RATE,viewed=Object.keys(tc).map(Number).filter(g=>QSL[g]>0).sort((a,b)=>a-b);
+ let read=new Set(viewed.filter(g=>tc[g]>=need(g))),lo=Infinity,hi=0;read.forEach(g=>{if(g<lo)lo=g;if(g>hi)hi=g});
+ const bm=S.bm;
+ if(bm&&endT-bm.t<QS_BM_WINDOW){const upTo=viewed.filter(g=>g<=bm.g);
+  let start=null;if(read.size&&lo<=bm.g)start=lo;
+  else if(upTo.length){let T=0,N=0;upTo.forEach(g=>{T+=tc[g];N+=need(g)});if(T>=.5*N)start=upTo[0]}   // قراءة منطقية قبل العلامة
+  if(start!==null){lo=start;hi=bm.g;read=new Set([...read].filter(g=>g<=bm.g));read.add(bm.g);m.bm=bm.g}}
+ if(read.size)viewed.forEach(g=>{if(g>=lo&&g<=hi)read.add(g)});
+ viewed.forEach(g=>{if(!read.has(g)){m.sk++;m.skl+=QSL[g]}});
+ read.forEach(g=>{const L=QSL[g],q=QSQ[g];m.v++;m.w+=QSW[g];m.l+=L;m.t+=Math.min(tc[g]||0,need(g)*QS_SLOW);
+  m.p+=L/QSU.p[QSP[g]];m.q+=L/QSU.q[q];m.h+=L/QSU.h[Math.ceil(q/4)];m.j+=L/QSU.j[Math.ceil(q/8)];
+  if(!m.first||g<m.first)m.first=g;if(g>m.last)m.last=g});
  m.t=Math.round(m.t);return m}
 
 function qsSave(){if(QSS)st(QS_KEY,JSON.stringify(QSS));else try{localStorage.removeItem(QS_KEY)}catch(e){}}
@@ -442,7 +456,7 @@ function qsTick(){const now=Date.now(),dt=Math.min(2,(now-(qsLastTick||now))/100
 /* إنهاء الجلسة: why = 'end' | 'exit' | 'prev' */
 function qsEnd(why,after){const S=QSS;QSS=null;qsSave();if(!S){after&&after();return null}
  const m=qsMetrics(S);
- if(m.v>0){const h=qsHist();h.list.unshift({s:m.s,e:m.e,t:m.t,a:m.a,v:m.v,w:m.w,l:m.l,p:+m.p.toFixed(3),q:+m.q.toFixed(3),h:+m.h.toFixed(3),j:+m.j.toFixed(3),sk:m.sk,skl:m.skl,f:m.first,z:m.last});h.list=h.list.slice(0,1000);st(QS_HIST,JSON.stringify(h))}
+ if(m.v>0){const h=qsHist();h.list.unshift({s:m.s,e:m.e,t:m.t,a:m.a,v:m.v,w:m.w,l:m.l,p:+m.p.toFixed(3),q:+m.q.toFixed(3),h:+m.h.toFixed(3),j:+m.j.toFixed(3),sk:m.sk,skl:m.skl,f:m.first,z:m.last,b:m.bm});h.list=h.list.slice(0,1000);st(QS_HIST,JSON.stringify(h))}
  qsHome();if($('stats').classList.contains('on'))qsRender();
  if(why==='exit'){after&&after();return m}
  if(m.v>0||why==='end')qsShow(m,why==='prev'?'prev':'end',after);else after&&after();
@@ -476,7 +490,7 @@ function qsShow(m,kind,cb){const d=$('qsdlg');qsDlg={kind,cb};
   ${kind==='prev'?'<p class="qs-sub">ملخص جلستك السابقة</p>':kind==='detail'?`<p class="qs-sub">${qsDate(m.s)} · ${qsTime(m.s)} – ${qsTime(m.e)}</p>`:''}
   ${none?'<p class="qs-time">لم تُحتسب قراءة فعلية في هذه الجلسة</p><p class="qs-sub">التقليب السريع للصفحات لا يُحتسب قراءة. أبطأ ما يُحتسب هو سرعة ختم القرآن في ٧ ساعات ونصف.</p>':
   `<p class="qs-time">لقد قرأت لمدة: <b>${qsDur(m.t)}</b></p>${qsRows(m)}
-  ${m.first?`<p class="qs-sub">من ${qsRef(m.first)} إلى ${qsRef(m.last)}</p>`:''}
+  ${m.first?`<p class="qs-sub">من ${qsRef(m.first)} إلى ${qsRef(m.last)}${m.bm?' (عند العلامة المرجعية)':''}</p>`:''}
   ${m.sk?`<p class="qs-sub">استُبعد ${qsN(m.sk)} آية مرّت سريعًا دون قراءة</p>`:''}
   <p class="qs-dua">تقبل الله منك وجعل القرآن شفيعًا لك يوم القيامة</p>`}
   <div class="qs-btns">${kind==='exit'?'<button class="gbtn" data-qs="exit">إنهاء والخروج</button><button class="obtn" data-qs="stay">متابعة القراءة</button>':'<button class="gbtn" data-qs="ok">حسنًا</button>'+(kind!=='detail'?'<button class="obtn" data-qs="stats">سجل القراءة</button>':'')}</div></div>`;
@@ -503,11 +517,11 @@ function qsRender(){const H=qsHist().list,now=new Date(),d0=new Date(now.getFull
   <div class="qs-grid">${tile('زمن القراءة',qsDur(T.t))}${tile('الجلسات',qsN(T.n))}${tile('الآيات',qsN(T.v))}${tile('الكلمات',qsN(T.w))}${tile('الأحرف',qsN(T.l))}${tile('الصفحات',qsAmt(T.p,'صفحة'))}${tile('الأرباع',qsAmt(T.q,'ربع'))}${tile('الأحزاب',qsAmt(T.h,'حزب'))}${tile('الأجزاء',qsAmt(T.j,'جزء'),T.j>=30?'ما يعادل '+qsN(T.j/30,1)+' ختمة':'')}</div>
   <h3 class="sec">سجل الجلسات</h3>`+
   (H.length?H.slice(0,150).map((x,i)=>`<button class="row qs-row" data-qsi="${i}"><div class="t"><b>${qsDate(x.s)}</b><small>${qsTime(x.s)} – ${qsTime(x.e)} · ${qsDur(x.t)}</small><small>${qsN(x.v)} آية · ${qsN(x.w)} كلمة · ${qsAmt(x.p,'صفحة')}${x.f?' · '+qsRef(x.f)+' – '+qsRef(x.z):''}</small></div></button>`).join(''):'<div class="empty">لا توجد جلسات مسجلة بعد.<br>ابدأ القراءة وسيُسجَّل وردك تلقائيًا.</div>')+
-  `<p class="pnote">تُحتسب الآية مقروءة إذا بقيت ظاهرة وقتًا يكفي لقراءتها بأقصى سرعة ممكنة (ختم القرآن في ٧ ساعات ونصف ≈ ${qsN(QS_RATE,1)} حرف في الثانية). التقليب الأسرع من ذلك لا يُحتسب، ولا يُحتسب الوقت إذا تُرك الجهاز دون تفاعل. الصفحات والأرباع والأحزاب والأجزاء محسوبة بعدد الحروف وفق مصحف المدينة النبوية (${qsN(QPAGES.length)} صفحة).</p>`+
+  `<p class="pnote">تُحتسب الآية مقروءة إذا بقيت ظاهرة وقتًا يكفي لقراءتها بأقصى سرعة ممكنة (ختم القرآن في ٧ ساعات ونصف ≈ ${qsN(QS_RATE,1)} حرف في الثانية). إذا بدأت الجلسة وانتهت بقراءة فعلية تُحتسب كل الآيات التي مرّت بينهما مهما كانت السرعة، أما التقليب خارج ذلك فلا يُحتسب. العلامة المرجعية الموضوعة قبل نهاية الجلسة بأقل من دقيقة تُعدّ نقطة النهاية. لا يُحتسب الوقت إذا تُرك الجهاز دون تفاعل. الصفحات والأرباع والأحزاب والأجزاء محسوبة بعدد الحروف وفق مصحف المدينة النبوية (${qsN(QPAGES.length)} صفحة).</p>`+
   (H.length?'<div class="qs-btns"><button class="obtn" data-qsact="clear">مسح سجل الإحصاءات</button></div>':'')}
 $('qsw').addEventListener('click',e=>{const t=e.target.closest('[data-qsp],[data-qsi],[data-qsact]');if(!t)return;
  if(t.dataset.qsp){qsPeriod=t.dataset.qsp;st('qsper',qsPeriod);qsRender();return}
- if(t.dataset.qsi){const x=qsHist().list[+t.dataset.qsi];if(x)qsShow({...x,first:x.f,last:x.z},'detail');return}
+ if(t.dataset.qsi){const x=qsHist().list[+t.dataset.qsi];if(x)qsShow({...x,first:x.f,last:x.z,bm:x.b||0},'detail');return}
  if(t.dataset.qsact==='end'){qsEnd('end');return}
  if(t.dataset.qsact==='clear'&&confirm('مسح كل سجل إحصاءات القراءة؟ لا يمكن التراجع.')){try{localStorage.removeItem(QS_HIST)}catch(e){}qsRender();qsHome();toast('تم مسح السجل')}});
 
@@ -515,6 +529,10 @@ function qsHome(){const c=$('qscard');if(!c)return;const H=qsHist().list,d0=new 
  if(live&&live.v){T.t+=live.t;T.v+=live.v;T.p+=live.p}
  c.innerHTML=`<span class="pi">📖</span><span class="pt"><small>وردك اليوم</small><b>${T.v?qsDur(T.t):'لم تبدأ بعد'}</b><small>${T.v?qsN(T.v)+' آية · '+qsAmt(T.p,'صفحة'):'إحصاءات القراءة وسجل الجلسات'}</small></span><span class="x">‹</span>`}
 
+/* تسجيل العلامة المرجعية الموضوعة أثناء الجلسة (يعمل بعد معالج العلامات الأصلي) */
+$('rbody').addEventListener('click',e=>{const el=e.target.closest('.v');if(!el)return;const v=(BS[curS-1]||[])[+el.dataset.n-1];if(!v)return;const now=Date.now();
+ if(marks[curS+':'+v.n]){if(!QSS)QSS={s:now,last:now,a:0,tc:{}};QSS.bm={g:v.g,t:now};QSS.last=now;qsSave()}
+ else if(QSS&&QSS.bm&&QSS.bm.g===v.g){delete QSS.bm;qsSave()}});
 ['scroll','touchstart','wheel'].forEach(ev=>$('rbody').addEventListener(ev,()=>{qsLastInput=Date.now()},{passive:true}));
 ['keydown','click','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{qsLastInput=Date.now()},{passive:true}));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){qsSave()}else{qsLastTick=Date.now();qsLastInput=Date.now();if(QSS&&Date.now()-QSS.last>QS_GAP)qsEnd('prev')}});
