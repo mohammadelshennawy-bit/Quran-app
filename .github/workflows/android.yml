@@ -34,6 +34,12 @@ jobs:
           keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android | tail -2
       - run: npm install
       - run: npx cap add android
+      - name: Storage permissions for backups (Android 10 and older)
+        run: |
+          M=android/app/src/main/AndroidManifest.xml
+          grep -q WRITE_EXTERNAL_STORAGE $M || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>\n</manifest>#' $M
+          grep -q requestLegacyExternalStorage $M || sed -i 's#<application#<application android:requestLegacyExternalStorage="true"#' $M
+          grep -n "permission\|<application" $M
       - name: Set Android version (shown in phone settings)
         run: |
           G=android/app/build.gradle
