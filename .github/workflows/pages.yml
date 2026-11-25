@@ -31,7 +31,12 @@ jobs:
           sed -i -E "s/^const VERSION = '[^']*'/const VERSION = 'rawd-$VER'/; s/^const C='[^']*'/const C='mushaf-$VER'/" www/sw.js
           head -c 160 www/sw.js; echo
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with: {path: www}
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: www
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
